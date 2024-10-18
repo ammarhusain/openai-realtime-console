@@ -118,7 +118,37 @@ export function ConsolePage() {
   const [isConnected, setIsConnected] = useState(false);
   const [canPushToTalk, setCanPushToTalk] = useState(true);
   const [isRecording, setIsRecording] = useState(false);
-  const [memoryKv, setMemoryKv] = useState<{ [key: string]: any }>({});
+  // const [memoryKv, setMemoryKv] = useState<{ [key: string]: any }>({});
+  const [memoryKv, setMemoryKv] = useState<{ [key: string]: any }>({
+      diet: "non vegetarian",
+      favorite_color: "blue",
+      superpower: "time travel",
+      favorite_dinosaur: "velociraptor",
+      ideal_sandwich_filling: "peanut butter and pickles",
+      favorite_dance_moves: "robot",
+      quirky_superstition: "never step on cracks",
+      unusual_collection: "vintage rubber ducks",
+      comfort_food: "mac and cheese with hot sauce",
+      preferred_time_travel_era: "roaring twenties",
+      signature_karaoke_song: "Bohemian Rhapsody",
+      strange_skill: "speaking backwards fluently",
+      dream_job_as_a_kid: "professional pillow tester",
+      favorite_smell: "fresh rain on asphalt",
+      pet_preference: "cats",
+      music_genre: "indie rock",
+      favorite_sport: "basketball",
+      travel_style: "backpacking",
+      reading_preference: "non-fiction",
+      movie_genre: "science fiction",
+      exercise_routine: "yoga",
+      coffee_preference: "espresso",
+      dream_vacation: "Bali",
+      cooking_style: "Mediterranean",
+      allergic_to: "dogs, pollen",
+      technological_affinity: "early adopter",
+      environmental_concern: "high",
+      work_style: "remote",
+  });
   const [coords, setCoords] = useState<Coordinates | null>({
     lat: 37.775593,
     lng: -122.418137,
@@ -385,7 +415,7 @@ export function ConsolePage() {
     client.addTool(
       {
         name: 'set_memory',
-        description: 'Saves important data about the user into memory.',
+        description: 'Saves important data about the user into memory. Should be called everytime the user says something memorable about themselves like their likes or dislikes, their preferences or any interesting event that happened in their life',
         parameters: {
           type: 'object',
           properties: {
@@ -414,7 +444,7 @@ export function ConsolePage() {
     client.addTool(
       {
         name: 'get_memories',
-        description: 'Returns the users memories, preferences, likes and dislikes that they might have mentioned during casual conversation',
+        description: 'Retrieves the users stored memories, preferences, likes and dislikes that they might have mentioned during casual conversation. Tells you more about their personality.',
         parameters: {
           type: 'object',
           properties: {},
@@ -424,17 +454,44 @@ export function ConsolePage() {
       async () => {
         // Use a callback to get the most current state
         return new Promise((resolve) => {
-          setMemoryKv((currentMemoryKv) => {
-            const memoriesString = JSON.stringify(currentMemoryKv, null, 2);
-            console.log("Called get_memories");
-            console.log(memoriesString);
-            resolve(memoriesString);
-            return currentMemoryKv; // Return the current state unchanged
-          });
+          resolve(memoryKv);
+          return {memories: memoryKv}
+          // setMemoryKv((currentMemoryKv) => {
+          //   const memoriesObject = currentMemoryKv;
+          //   console.log("Called get_memories");
+          //   console.log(memoriesObject);
+          //   resolve(memoriesObject);
+          //   return memoriesObject; // Return the current state unchanged
+          //   // // 2. Send the result of the function call
+          //   // client.realtime.send("conversation.item.create",[
+          //   //   {
+          //   //     type: "function_call_output",
+          //   //     role: "system",
+          //   //     output: `${memoriesString}`,
+          //   //   }
+          //   // ]);
+          //   // // 3. Request a response
+          //   // client.realtime.send("response.create",[]);
+          //   // return memoriesString; // Return the current state unchanged
+          // });
         });
       }
     );
-    
+    client.addTool(
+      {
+        name: 'do_foobar',
+        description: 'Performs the foobar operation and returns its results',
+        parameters: {
+          type: 'object',
+          properties: {},
+          required: [],
+        },
+      },
+      async () => {
+        // Use a callback to get the most current state
+        return "This is certainly magical - the result is 42";
+      }
+    );
     client.addTool(
       {
         name: 'get_weather',
@@ -475,6 +532,18 @@ export function ConsolePage() {
           units: json.current_units.wind_speed_10m as string,
         };
         setMarker({ lat, lng, location, temperature, wind_speed });
+
+        // // 2. Send the result of the function call
+        // client.realtime.send("conversation.item.create",[
+        //   {
+        //     type: "function_call_output",
+        //     role: "system",
+        //     output: `${JSON.stringify(json, null, 2)}`,
+        //   }
+        // ]);
+        // // 3. Request a response
+        // client.realtime.send("response.create",[]);
+        
         return json;
       }
     );
@@ -725,7 +794,7 @@ export function ConsolePage() {
         <div className="content-right">
 
           <div className="content-block kv">
-            <div className="content-block-title">in_memory()</div>
+            <div className="content-block-title">Memory Store</div>
             <div className="content-block-body content-kv">
               {JSON.stringify(memoryKv, null, 2)}
             </div>
